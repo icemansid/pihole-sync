@@ -118,7 +118,5 @@ fi
  
 if [ $RESTART == "1" ]; then
   # INSTALL FILES AND RESTART pihole
-  ssh $HAUSER@$PIHOLE2 "sudo -S service pihole-FTL stop"
-  ssh $HAUSER@$PIHOLE2 "sudo -S pkill pihole-FTL"
-  ssh $HAUSER@$PIHOLE2 "sudo -S service pihole-FTL start"
+ssh $HAUSER@$PIHOLE2 "sudo -S service pihole-FTL restart"
 fi
