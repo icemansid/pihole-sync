@@ -1,7 +1,7 @@
 #!/bin/bash -x
 #  README
 :'
-Version 2.1
+Version 2.1.1
 -----------------------------
 Credit to redditor /u/jvinch76  https://www.reddit.com/user/jvinch76 for creating the basis for this modification.
 -----------------------------
@@ -10,33 +10,23 @@ Previous Pastebin https://pastebin.com/KFzg7Uhi
 -----------------------------
 Reddit link https://www.reddit.com/r/pihole/comments/9hi5ls/dual_pihole_sync_20/
 -----------------------------
-Improvements:  check for existence of files before rsync and skip if not present, allow for remote command to be run without password by adding ssh keys to remote host no no longer require hard coding password in this script, HAPASS removed
+Improvements:  check for existence of files before rsync and skip if not present, allow for remote command to be run 
+without password by adding ssh keys to remote host no longer require hard coding password in this script, HAPASS removed.
 -----------------------------
- 
-I had been thinking of a script like his to keep my primary and secondary pihole in sync, but could not find the motivation to create it.
-/u/jvinch76 did the heavy lifting and I made changes I hope you find useful.
- 
-I modified the code to increase the frequency of the sync to every 5 minutes and reduce the file writes by using rsync to compare the files and only transfer changes.
-Furthermore, gravity will be updated and services restarted only if files are modified and a sync occurs.
- 
-I am unsure of the performance cost, but it is likely there is a trade-off with rsync being more cpu heavy, but this script reduces the disk write to minimal amounts if no sync is necessary.
- 
-Why run dual piholes?
-If you are not, you really, really should be.  If the primary pihole is being updated, undergoing maintenance, running a backup, or simply failed you will not have a backup pihole available.
-This will happen on your network.  Your only other option during an outage (usually unexpected) is to configure your DHCP server to forward to a non-pihole, public DNS, thusly defeating why you have pihole installed in the first place.
-Furthermore, DNS is high availability by design and the secondary\tertiary DNS always receives some portion of the DNS traffic and if configured with a public DNS IP, your devices will be bypassing the safety of pihole blocking.
-If you are running a single pihole and have that pihole listed as the only DNS entry in your DHCP setting, all devices on your network will immediately be unable to resolve DNS if that pihole goes offline.
-I recommend running a PI3 as your primary and a PI3/PI2/ZeroW as your secondary.  PI2/ZeroW is more than sufficient as a secondary and emergency failover.
- 
-What about using my pihole for DHCP?
-I still prefer to use my router for DHCP, if you need help refer to /u/jvinch76 post https://www.reddit.com/r/pihole/comments/9gw6hx/sync_two_piholes_bash_script/
-or other docs about using pihole for DHCP with this script.
- 
+2.1.1 Changes - add directions for complete n00bs who never use the root account. (Pre Install Steps)
+-----------------------------
+Credit for Origonal version
+/u/jvinch76
+-----------------------------
+Credit for V2
 /u/LandlordTiberius
+-----------------------------
+Me
+/u/ShawnEngland
+-----------------------------
+
  
-'
-:'
-# Pre-Install STEPS
+# Pre-Install STEPS to setup ROOT account
 1.  Log into primary pihole
 2.  "sudo nano /etc/passwd"
 3.  change first root line to "root::0:0:root:/root:/bin/bash" (remove the X)
@@ -47,9 +37,8 @@ or other docs about using pihole for DHCP with this script.
 8.  run "sudo /etc/init.d/ssh restart"
 10. Run "sudo passwd root" and change the password - Remember IT!
 11. Repeat setps 1-10 on 2nd PIHOLE.
-'
+
 # INSTALLATION STEPS ON PRIMARY PIHOLE
-: '
 1. Login to Primary Pi - run "sudo su" - this will elevate you to root.
 2. type "sudo nano ~/piholesync.rsync.sh" to create file
 3. cut and paste all information in this code snippet
@@ -59,8 +48,8 @@ or other docs about using pihole for DHCP with this script.
  
 # CREATE SSH file transfer permissions
 7. type "ssh-keygen" (hit enter 3 times to accept default values)
-8. type "ssh-copy-id root@192.168.2.252" <- type the same HAUSER and IP as PIHOLE2, this IP is specific to your network, 192.168.1.3 is an example only
-9. type "yes" - YOU MUST TYPE "yes", not "y"
+8. type "ssh-copy-id root@192.168.2.252"  <- IP address of PiHole 2
+9. type "yes"
 10. type the password of your secondary pihole
  
 # ENABLE REMOTE COMMANDS USING SSH Keys ON Remote pihole
@@ -87,7 +76,7 @@ or other docs about using pihole for DHCP with this script.
 #VARS
 FILES=(black.list blacklist.txt regex.list whitelist.txt lan.list) #list of files you want to sync
 PIHOLEDIR=/etc/pihole #working dir of pihole
-PIHOLE2=192.168.1.3 #IP of 2nd PiHole
+PIHOLE2=192.168.1.252 #IP of 2nd PiHole
 HAUSER=root #user of second pihole
  
 #LOOP FOR FILE TRANSFER
